@@ -19,7 +19,8 @@ Built incrementally; each layer is tested as it lands.
 
 - [x] **KV-cache + step-by-step decoding** — cached decode proves identical to
       recomputing the full prefix; ~O(n) vs O(n²) per generation
-- [ ] **Paged KV-cache** — block allocator for the cache (no fragmentation)
+- [x] **Paged KV-cache** — block allocator + per-sequence block tables; gather
+      equals contiguous under attention, no fragmentation, sequences isolated
 - [ ] **Continuous batching scheduler** — add/evict requests mid-flight
 - [ ] **OpenAI-compatible endpoint** — actually serve it
 - [ ] Throughput demo on GPU + write-up
