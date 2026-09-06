@@ -21,7 +21,8 @@ Built incrementally; each layer is tested as it lands.
       recomputing the full prefix; ~O(n) vs O(n²) per generation
 - [x] **Paged KV-cache** — block allocator + per-sequence block tables; gather
       equals contiguous under attention, no fragmentation, sequences isolated
-- [ ] **Continuous batching scheduler** — add/evict requests mid-flight
+- [x] **Continuous batching scheduler** — iteration-level admit/retire; batched
+      output proven identical to isolated generation; capacity + EOS handling
 - [ ] **OpenAI-compatible endpoint** — actually serve it
 - [ ] Throughput demo on GPU + write-up
 
