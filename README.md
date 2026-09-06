@@ -23,7 +23,8 @@ Built incrementally; each layer is tested as it lands.
       equals contiguous under attention, no fragmentation, sequences isolated
 - [x] **Continuous batching scheduler** — iteration-level admit/retire; batched
       output proven identical to isolated generation; capacity + EOS handling
-- [ ] **OpenAI-compatible endpoint** — actually serve it
+- [x] **OpenAI-compatible endpoint** — `/v1/completions` over the engine; pure
+      request→response logic tested on CPU, thin FastAPI wrapper
 - [ ] Throughput demo on GPU + write-up
 
 ## The idea so far: KV-cache
@@ -57,6 +58,32 @@ length, as O(n) vs O(n² predicts):
 gen  32 tokens | no-cache 0.154s | cached 0.062s | speedup 2.5x
 gen  64 tokens | no-cache 0.381s | cached 0.133s | speedup 2.9x
 gen 128 tokens | no-cache 1.129s | cached 0.313s | speedup 3.6x
+```
+
+## Serve (OpenAI-compatible)
+
+The engine sits behind a standard `/v1/completions` endpoint. The request/response
+logic is a pure function (`handle_completion`) tested without any web server; a
+thin FastAPI layer exposes it.
+
+```bash
+pip install -e ".[serve]"
+python -m mini_vllm.server            # serves a tiny random model on :8000
+
+curl localhost:8000/v1/completions -H 'content-type: application/json' \
+  -d '{"prompt": "hello", "max_tokens": 16}'
+```
+
+The model is random, so the text is gibberish — this demonstrates the serving
+path (batched via the continuous-batching engine, OpenAI-shaped response with
+token usage), not generation quality. In code, without a server:
+
+```python
+from mini_vllm import TinyTransformer, ModelConfig, ByteTokenizer, handle_completion
+model = TinyTransformer(ModelConfig(vocab_size=256)).eval()
+resp = handle_completion(model, ByteTokenizer(),
+                         {"prompt": ["hi", "there"], "max_tokens": 8})
+# resp["choices"] -> one per prompt; resp["usage"] -> token counts
 ```
 
 ## Install & test
