@@ -13,6 +13,8 @@ transformer you can run on a laptop.
 > each component is small, readable, and covered by CPU tests — the GPU is only
 > for the final throughput demo.
 
+**How it fits together:** see the [architecture write-up](docs/architecture.md).
+
 ## Status
 
 Built incrementally; each layer is tested as it lands.
@@ -25,7 +27,8 @@ Built incrementally; each layer is tested as it lands.
       output proven identical to isolated generation; capacity + EOS handling
 - [x] **OpenAI-compatible endpoint** — `/v1/completions` over the engine; pure
       request→response logic tested on CPU, thin FastAPI wrapper
-- [ ] Throughput demo on GPU + write-up
+- [x] Architecture [write-up](docs/architecture.md)
+- [ ] Throughput demo on GPU (fused batched PagedAttention step)
 
 ## The idea so far: KV-cache
 
